@@ -6,11 +6,11 @@ For feature requests / bug reports / updates, please visit us at http://code.goo
 
 Files
 ------------------
-* google-translate-api-v2-core-XXX.jar - Contains full comprehensive access to all the API functionality.
+* google-translate-api-v2-java-core-XXX.jar - Contains full comprehensive access to all the API functionality.
   Depends on all the JAR files contained in lib-core
 
-* google-translate-api-v2-cli-XXX.jar - Contains full comprehensive access to all the API functionality using a Command Line Interface.
-  Depends on google-translate-api-v2-core-XXX.jar and all the JAR files contained in lib-core and lib-cli.
+* google-translate-api-v2-java-cli-XXX.jar - Contains full comprehensive access to all the API functionality using a Command Line Interface.
+  Depends on google-translate-api-v2-java-core-XXX.jar and all the JAR files contained in lib-core and lib-cli.
 
 
 

@@ -127,7 +127,7 @@ public class TranslatorCli {
     private static void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(
-                "java -jar org.google.translate.api.v2.cli.TranslatorCli"
+                "java -jar google-translate-api-v2-java-cli-0.5.jar"
                 , null
                 , OPTIONS
                 , "Examples:\n" +

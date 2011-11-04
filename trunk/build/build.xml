@@ -5,7 +5,7 @@
     <property name="classes.dir" value="out\production"/>
     <property name="core.classes.dir" value="out\production\core"/>
     <property name="cli.classes.dir" value="out\production\cli"/>
-    <property name="name.prefix" value="google-translate-api-v2-"/>
+    <property name="name.prefix" value="google-translate-api-v2-java-"/>
     <property name="name.suffix" value="${version}"/>
     <property name="core.jar.name" value="${name.prefix}core-${name.suffix}.jar"/>
     <property name="cli.jar.name" value="${name.prefix}cli-${name.suffix}.jar"/>
