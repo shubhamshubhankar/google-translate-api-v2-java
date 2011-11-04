@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="lib-cli">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/cli/lib" />
+      <root url="file://$PROJECT_DIR$/cli/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/cli/lib" recursive="false" />
+  </library>
+</component>

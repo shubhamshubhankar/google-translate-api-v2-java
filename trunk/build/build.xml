@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="google-translate-api-v2-java" default="build" basedir="../">
+
+    <property name="version" value="0.5"/>
+    <property name="classes.dir" value="out\production"/>
+    <property name="core.classes.dir" value="out\production\core"/>
+    <property name="cli.classes.dir" value="out\production\cli"/>
+    <property name="name.prefix" value="google-translate-api-v2-"/>
+    <property name="name.suffix" value="${version}"/>
+    <property name="core.jar.name" value="${name.prefix}core-${name.suffix}.jar"/>
+    <property name="cli.jar.name" value="${name.prefix}cli-${name.suffix}.jar"/>
+    <property name="build.dir" value="build"/>
+    <property name="artifacts.dir" value="${build.dir}/${name.prefix}${name.suffix}"/>
+    <property name="core.src" value="core/src"/>
+    <property name="cli.src" value="cli/src"/>
+    <property name="core.jar.full.path" value="${artifacts.dir}/${core.jar.name}"/>
+    <property name="cli.jar.full.path" value="${artifacts.dir}/${cli.jar.name}"/>
+    <property name="zip.name" value="${name.prefix}${name.suffix}.zip"/>
+
+    <path id="core.classpath">
+        <fileset id="core.classpath.fileset" dir="${artifacts.dir}/lib-core">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="cli.classpath">
+        <fileset refid="core.classpath.fileset" />
+        <fileset dir="${artifacts.dir}/lib-cli">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${artifacts.dir}" >
+            <include name="${core.jar.name}"/>
+        </fileset>
+    </path>
+
+    <!--
+        Delete the build dir
+        Delete classes dir
+    -->
+    <target name="cleanup">
+
+        <delete dir="${artifacts.dir}"/>
+
+        <delete includeemptydirs="true">
+            <fileset dir="${classes.dir}" includes="**/*"/>
+        </delete>
+
+        <mkdir dir="${classes.dir}" />
+        <mkdir dir="${artifacts.dir}"/>
+    </target>
+
+    <!--
+        Creates the jar dir,
+        Copies the lib to the jar dir
+        Compile
+        Copy resources
+    -->
+    <target name="compile.core">
+        <mkdir dir="${core.classes.dir}"/>
+
+        <copy todir="${artifacts.dir}/lib-core">
+            <fileset dir="core/lib"/>
+        </copy>
+
+        <javac srcdir="${core.src}" destdir="${core.classes.dir}" source="1.6"
+               classpathref="core.classpath" debug="on" debuglevel="lines,vars,source"/>
+
+        <copy todir="${core.classes.dir}">
+            <fileset dir="${core.src}">
+                <include name="**/*.properties"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!--
+        Creates a property that holds the Manifest Class-Path
+        Create the jar file
+    -->
+    <target name="create-core-jar" depends="compile.core">
+        <manifestclasspath property="core.jar.classpath" jarfile="${core.jar.full.path}">
+            <classpath refid="core.classpath"/>
+        </manifestclasspath>
+
+        <jar destfile="${core.jar.full.path}" basedir="${core.classes.dir}">
+            <manifest>
+                <!--suppress AntResolveInspection -->
+                <attribute name="Class-Path" value="${core.jar.classpath}"/>
+                <section name="common">
+                    <attribute name="Implementation-Title" value="Google Translate API v2"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
+    <!--
+            Creates the jar dir,
+            Copies the lib to the jar dir
+            Compile
+            Copy resources
+        -->
+    <target name="compile.cli">
+        <mkdir dir="${cli.classes.dir}"/>
+
+        <copy todir="${artifacts.dir}/lib-cli">
+            <fileset dir="cli/lib"/>
+        </copy>
+
+        <javac srcdir="${cli.src}" destdir="${cli.classes.dir}" source="1.6"
+               classpathref="cli.classpath" debug="on" debuglevel="lines,vars,source"/>
+
+        <copy todir="${cli.classes.dir}">
+            <fileset dir="${cli.src}">
+                <include name="**/*.properties"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <!--
+            Creates a property that holds the Manifest Main-Class and Class-Path
+            Create the jar file
+        -->
+    <target name="create-cli-jar" depends="compile.cli">
+        <manifestclasspath property="cli.jar.classpath" jarfile="${cli.jar.full.path}">
+            <classpath refid="cli.classpath"/>
+        </manifestclasspath>
+
+        <jar destfile="${cli.jar.full.path}" basedir="${cli.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="org.google.translate.api.v2.cli.TranslatorCli"/>
+                <!--suppress AntResolveInspection -->
+                <attribute name="Class-Path" value="${cli.jar.classpath}"/>
+                <section name="common">
+                    <attribute name="Implementation-Title" value="Google Translate API v2 CLI"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
+    <!--
+        Copy and adjust execution files
+        Create a zip that contains it all
+    -->
+    <target name="build" depends="cleanup,create-core-jar,create-cli-jar">
+        <copy todir="${artifacts.dir}">
+            <fileset dir="${build.dir}">
+                <include name="readme.txt"/>
+            </fileset>
+        </copy>
+
+        <zip destfile="${artifacts.dir}/${zip.name}" basedir="${artifacts.dir}" />
+    </target>
+</project>
