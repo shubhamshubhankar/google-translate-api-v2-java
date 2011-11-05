@@ -109,9 +109,6 @@ public class Translator implements Closeable {
         TranslateResponse translateResponse = readResponse(httpPost, TranslateResponse.class);
         Translation[] translations = translateResponse.getData().getTranslations();
         for (Translation translation : translations) {
-            if (translation.getDetectedSourceLanguage() == null) {
-                translation.setDetectedSourceLanguage(sourceLanguage);
-            }
             translation.setTranslatedText(StringEscapeUtils.unescapeHtml4(translation.getTranslatedText()));
         }
         return translations;

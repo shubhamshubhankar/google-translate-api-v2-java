@@ -10,8 +10,9 @@ public class Translation {
      */
     private String translatedText;
     /**
-     * The detected source language or null if null sourceLanguage was passed to the
-     * {@link org.google.translate.api.v2.core.Translator#translate(java.lang.String, java.lang.String, java.lang.String)} method.
+     * The detected source language if auto detect (null sourceLanguage was passed to the
+     * {@link org.google.translate.api.v2.core.Translator#translate(java.lang.String, java.lang.String, java.lang.String)} method)
+     * or null in case it wasn't auto detect.
      */
     private String detectedSourceLanguage;
 
