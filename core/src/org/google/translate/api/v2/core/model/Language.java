@@ -4,7 +4,7 @@ package org.google.translate.api.v2.core.model;
  * Represents a Google Translate API Language
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Language {
+public class Language implements Comparable<Language> {
     /**
      * The language code
      */
@@ -41,6 +41,20 @@ public class Language {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * If {@link #name} of this and other is not null - compare using the name,
+     * otherwise compare using the {@link #language}.
+     *
+     * @param other the object to compare tp
+     * @return {@link String#compareTo(String)} on the {@link #name} or the {@link #language}.
+     */
+    @Override
+    public int compareTo(Language other) {
+        return (name != null && other.name != null) 
+                ? name.compareTo(other.name)
+                : language.compareTo(other.language);
     }
 
     @Override
