@@ -12,6 +12,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -22,6 +24,7 @@ public class TranslatorCli {
 
     private static final Options OPTIONS = new Options();
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslatorCli.class);
+    private static final String VERBOSE_ARG = "-" + TranslatorOption.VERBOSE.getOpt();
 
     static {
         for (TranslatorOption translatorOption : TranslatorOption.values()) {
@@ -31,6 +34,18 @@ public class TranslatorCli {
 
     public static void main(String[] args) throws Exception {
 
+        // Manually searching for the verbose option to print the raw arguments before parsing
+        boolean verbose = false;
+        for (String arg : args) {
+            if (VERBOSE_ARG.equals(arg)) {
+                verbose = true;
+                break;
+            }
+        }
+        if (verbose) {
+            printVerbose("Raw arguments: " + Arrays.toString(args));
+        }
+
         CommandLine commandLine;
         Parser parser = new GnuParser();
         try {
@@ -39,6 +54,28 @@ public class TranslatorCli {
             printHelp();
             throw e;
         }
+
+        if (verbose) {
+            StringBuilder message = new StringBuilder("Parsed options: ");
+            for (Option option : commandLine.getOptions()) {
+                if (option != null) {
+                    String optionName = (option.getLongOpt() != null) ? option.getLongOpt() : option.getOpt();
+                    message.append(optionName);
+                    String[] optionValues = option.getValues();
+                    if (optionValues != null) {
+                        message.append('=');
+                        if (optionValues.length == 1) {
+                            message.append('\'').append(optionValues[0]).append('\'');
+                        } else {
+                            message.append(Arrays.toString(optionValues));
+                        }
+                    }
+                    message.append(' ');
+                }
+            }
+            printVerbose(message.toString());
+        }
+
 
         if (TranslatorOption.HELP.isOn(commandLine) || args.length == 0) {
             printVersion();
@@ -68,12 +105,18 @@ public class TranslatorCli {
 
             if (TranslatorOption.LANGUAGES.isOn(commandLine)) {
                 String targetLanguage = TranslatorOption.TARGET_LANGUAGE.getOptionValue(commandLine);
+                if (verbose) {
+                    printVerbose("Requesting languages with targetLanguage = '" + targetLanguage + "'");
+                }
                 Languages languages = new Languages(translator.languages(targetLanguage));
                 print(outputFormat.format(languages));
             }
 
             if (TranslatorOption.DETECT.isOn(commandLine)) {
                 String[] sourceTexts = TranslatorOption.DETECT.getOptionValues(commandLine);
+                if (verbose) {
+                    printVerbose("Requesting detect with sourceTexts = " + Arrays.toString(sourceTexts));
+                }
                 Detections detections = new Detections(translator.detect(sourceTexts));
                 print(outputFormat.format(detections));
             }
@@ -86,7 +129,9 @@ public class TranslatorCli {
                 if (targetLanguage == null) {
                     throw new MissingOptionException(TranslatorOption.TARGET_LANGUAGE + " (" + TranslatorOption.TARGET_LANGUAGE.getOption().getDescription() + ")");
                 }
-
+                if (verbose) {
+                    printVerbose("Requesting translate with sourceTexts = " + Arrays.toString(sourceTexts) + ", sourceLanguage = '" + sourceLanguage + "' and targetLanguage = '" + targetLanguage + "'");
+                }
                 Translations translations = new Translations(translator.translate(sourceTexts, sourceLanguage, targetLanguage));
                 print(outputFormat.format(translations));
             }
@@ -94,6 +139,10 @@ public class TranslatorCli {
         } finally {
             close(translator);
         }
+    }
+
+    private static void printVerbose(String text) {
+        print("VERBOSE: " + text);
     }
 
     private static void printVersion() throws IOException {
@@ -131,9 +180,9 @@ public class TranslatorCli {
                 , null
                 , OPTIONS
                 , "Examples:\n" +
-                        "--apiKey YOUR_GOOGLE_API_KEY --translate \"Hello\" \"Hola\" --targetLanguage iw\n" +
-                        "--apiKey YOUR_GOOGLE_API_KEY --detect \"Hello\" \"Hola\" --output xml\n" +
-                        "--apiKey YOUR_GOOGLE_API_KEY --languages --targetLanguage en\n"
+                "--apiKey YOUR_GOOGLE_API_KEY --translate \"Hello\" \"Hola\" --targetLanguage iw\n" +
+                "--apiKey YOUR_GOOGLE_API_KEY --detect \"Hello\" \"Hola\" --output xml\n" +
+                "--apiKey YOUR_GOOGLE_API_KEY --languages --targetLanguage en\n"
                 , true);
     }
 
