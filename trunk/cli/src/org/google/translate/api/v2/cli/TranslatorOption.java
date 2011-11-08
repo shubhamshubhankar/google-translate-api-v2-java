@@ -4,28 +4,30 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
 public enum TranslatorOption {
-    API_KEY(TranslatorCoreOptions.API_KEY, "Every request your application sends to the Google Translate API must identify your application to Google, using an API key (http://code.google.com/apis/language/translate/v2/using_rest.html#auth)"),
+    API_KEY("Every request your application sends to the Google Translate API must identify your application to Google, using an API key (http://code.google.com/apis/language/translate/v2/using_rest.html#auth)"),
 
-    TRANSLATE(TranslatorCoreOptions.TRANSLATE, "Translates source texts. Must be used with the " + TranslatorCoreOptions.TARGET_LANGUAGE + " to indicate the language to translate to, can also be used with the optional " + TranslatorCoreOptions.SOURCE_LANGUAGE + " option"),
+    TRANSLATE("Translates source texts. Must be used with the " + TranslatorCoreOptions.TARGET_LANGUAGE + " to indicate the language to translate to, can also be used with the optional " + TranslatorCoreOptions.SOURCE_LANGUAGE + " option"),
 
-    DETECT(TranslatorCoreOptions.DETECT, "Detects the language of source texts"),
+    DETECT("Detects the language of source texts"),
 
-    LANGUAGES(TranslatorCoreOptions.LANGUAGES, "Shows the supported languages that can be used in " + TranslatorCoreOptions.SOURCE_LANGUAGE + " and " + TranslatorCoreOptions.TARGET_LANGUAGE + " options. Can be used with the " + TranslatorCoreOptions.TARGET_LANGUAGE + " to show the names of the supported languages in addition to the codes"),
+    LANGUAGES("Shows the supported languages that can be used in " + TranslatorCoreOptions.SOURCE_LANGUAGE + " and " + TranslatorCoreOptions.TARGET_LANGUAGE + " options. Can be used with the " + TranslatorCoreOptions.TARGET_LANGUAGE + " to show the names of the supported languages in addition to the codes"),
 
-    SOURCE_LANGUAGE(TranslatorCoreOptions.SOURCE_LANGUAGE, "The language code of the source language. Used with the " + TranslatorCoreOptions.TRANSLATE + " option as the language from which to translate. If not mentioned, the source language will be auto detected"),
+    SOURCE_LANGUAGE("The language code of the source language. Used with the " + TranslatorCoreOptions.TRANSLATE + " option as the language from which to translate. If not mentioned, the source language will be auto detected"),
 
-    TARGET_LANGUAGE(TranslatorCoreOptions.TARGET_LANGUAGE, "The language code of the target language. Mandatory when using with the " + TranslatorCoreOptions.TRANSLATE + " option, optional when using with the " + TranslatorCoreOptions.LANGUAGES + " option"),
+    TARGET_LANGUAGE("The language code of the target language. Mandatory when using with the " + TranslatorCoreOptions.TRANSLATE + " option, optional when using with the " + TranslatorCoreOptions.LANGUAGES + " option"),
 
-    OUTPUT(TranslatorCoreOptions.OUTPUT, "The format of the output. Possible values are " + Settings.SUPPORTED_OUTPUTS),
+    OUTPUT("The format of the output. Possible values are " + Settings.SUPPORTED_OUTPUTS),
 
-    VERSION(TranslatorCoreOptions.VERSION, "Shows the version of the TranslatorCli and Translator core"),
+    VERSION("Shows the version of the TranslatorCli and Translator core"),
 
-    HELP(TranslatorCoreOptions.HELP, "Shows this help message");
+    HELP("Shows this help message"),
+
+    VERBOSE("Outputs more detailed information that can help troubleshooting");
 
     private TranslatorCoreOptions option;
 
-    private TranslatorOption(TranslatorCoreOptions option, String description) {
-        this.option = option;
+    private TranslatorOption(String description) {
+        this.option = TranslatorCoreOptions.valueOf(name());
         this.option.getOption().setDescription(description);
     }
 

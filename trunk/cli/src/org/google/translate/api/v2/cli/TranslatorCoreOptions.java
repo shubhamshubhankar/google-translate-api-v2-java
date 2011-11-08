@@ -51,7 +51,10 @@ enum TranslatorCoreOptions {
 
     HELP(OptionBuilder
             .withLongOpt("help")
-            .create("h"));
+            .create("h")),
+
+    VERBOSE(OptionBuilder
+                .create("verbose"));
 
     private Option option;
 
