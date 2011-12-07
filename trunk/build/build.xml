@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="google-translate-api-v2-java" default="build" basedir="../">
 
-    <property name="version" value="0.5"/>
+    <property name="version" value="0.51"/>
     <property name="classes.dir" value="out\production"/>
     <property name="core.classes.dir" value="out\production\core"/>
     <property name="cli.classes.dir" value="out\production\cli"/>

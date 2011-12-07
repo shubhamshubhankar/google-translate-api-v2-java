@@ -4,7 +4,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
 public enum TranslatorOption {
-    API_KEY("Every request your application sends to the Google Translate API must identify your application to Google, using an API key (http://code.google.com/apis/language/translate/v2/using_rest.html#auth)"),
+    API_KEY("Every request your application sends to the Google Translate API must identify your application to Google, using an API key (http://code.google.com/apis/language/translate/v2/using_rest.html#auth). Use the " + TranslatorCoreOptions.API_KEY + " option or the '" + TranslatorCli.GOOGLE_API_KEY + "' environment variable"),
 
     TRANSLATE("Translates source texts. Must be used with the " + TranslatorCoreOptions.TARGET_LANGUAGE + " to indicate the language to translate to, can also be used with the optional " + TranslatorCoreOptions.SOURCE_LANGUAGE + " option"),
 
