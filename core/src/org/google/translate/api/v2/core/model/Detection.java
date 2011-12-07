@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
  * @see org.google.translate.api.v2.core.Translator#detect(String[])
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Detection implements Comparable<Detection> {
+public class Detection extends AbstractResponseObject implements Comparable<Detection> {
     /**
      * The language code associated with the given text.
      * @see Language
@@ -81,6 +81,9 @@ public class Detection implements Comparable<Detection> {
 
     @Override
     public String toString() {
+        if (checkToStringFormat(SHORT_TO_STRING_FORMAT)) {
+            return language;
+        }
         return "Detection{" +
                 "language='" + language + '\'' +
                 ", reliable=" + reliable +

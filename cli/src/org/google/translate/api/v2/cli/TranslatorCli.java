@@ -5,6 +5,7 @@ import org.google.translate.api.v2.cli.model.Detections;
 import org.google.translate.api.v2.cli.model.Languages;
 import org.google.translate.api.v2.cli.model.Translations;
 import org.google.translate.api.v2.core.Translator;
+import org.google.translate.api.v2.core.model.AbstractResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -30,6 +30,9 @@ public class TranslatorCli {
         for (TranslatorOption translatorOption : TranslatorOption.values()) {
             OPTIONS.addOption(translatorOption.getOption());
         }
+        // Using the "to string format" from the system or using the CLI default
+        String toStringFormat = System.getProperty(AbstractResponseObject.TO_STRING_FORMAT, AbstractResponseObject.FULL_TO_STRING_FORMAT);
+        System.setProperty(AbstractResponseObject.TO_STRING_FORMAT, toStringFormat);
     }
 
     public static void main(String[] args) throws Exception {

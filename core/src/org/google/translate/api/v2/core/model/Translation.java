@@ -4,7 +4,7 @@ package org.google.translate.api.v2.core.model;
  * Represents a Google Translate API translation
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Translation {
+public class Translation extends AbstractResponseObject {
     /**
      * The translated text
      */
@@ -46,9 +46,14 @@ public class Translation {
 
     @Override
     public String toString() {
-        return "Translation{" +
-                "translatedText='" + translatedText + '\'' +
-                ", detectedSourceLanguage='" + detectedSourceLanguage + '\'' +
-                '}';
+        if (checkToStringFormat(SHORT_TO_STRING_FORMAT)) {
+            return translatedText;
+        }
+        String str = "Translation{" +
+                "translatedText='" + translatedText + '\'';
+        if (detectedSourceLanguage != null || checkToStringFormat(FULL_TO_STRING_FORMAT)) {
+            str += ", detectedSourceLanguage='" + detectedSourceLanguage + '\'';
+        }
+        return str + '}';
     }
 }
