@@ -22,6 +22,8 @@ import java.util.jar.Manifest;
  */
 public class TranslatorCli {
 
+    public static final String GOOGLE_API_KEY = "GOOGLE_API_KEY";
+
     private static final Options OPTIONS = new Options();
     private static final Logger LOGGER = LoggerFactory.getLogger(TranslatorCli.class);
     private static final String VERBOSE_ARG = "-" + TranslatorOption.VERBOSE.getOpt();
@@ -91,7 +93,7 @@ public class TranslatorCli {
             return;
         }
 
-        String apiKey = TranslatorOption.API_KEY.getOptionValue(commandLine);
+        String apiKey = TranslatorOption.API_KEY.getOptionValue(commandLine, System.getenv(GOOGLE_API_KEY));
         if (apiKey == null) {
             throw new MissingOptionException(TranslatorOption.API_KEY + " (" + TranslatorOption.API_KEY.getOption().getDescription() + ")");
         }
