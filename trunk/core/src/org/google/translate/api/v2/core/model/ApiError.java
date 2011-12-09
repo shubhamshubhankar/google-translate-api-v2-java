@@ -63,6 +63,8 @@ public class ApiError {
         private String domain;
         private String reason;
         private String message;
+        private String location;
+        private String locationType;
 
         public String getDomain() {
             return domain;
@@ -88,12 +90,30 @@ public class ApiError {
             this.message = message;
         }
 
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public String getLocationType() {
+            return locationType;
+        }
+
+        public void setLocationType(String locationType) {
+            this.locationType = locationType;
+        }
+
         @Override
         public String toString() {
             return "ErrorEntry{" +
                     "domain='" + domain + '\'' +
                     ", reason='" + reason + '\'' +
                     ", message='" + message + '\'' +
+                    ", location='" + location + '\'' +
+                    ", locationType='" + locationType + '\'' +
                     '}';
         }
     }
