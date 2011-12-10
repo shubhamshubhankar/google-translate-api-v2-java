@@ -35,6 +35,11 @@ import java.util.List;
  */
 public class Translator implements Closeable {
 
+    /**
+     * Used to avoid the Google API "Too many text segments" error
+     */
+    public static final int MAX_SOURCE_TEXTS = 128;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Translator.class);
     private static final String SCHEMA = "https";
     private static final String HOST = "www.googleapis.com";
@@ -95,7 +100,9 @@ public class Translator implements Closeable {
      * @throws TranslatorException In case Google Translate API returned an error.
      */
     public Translation[] translate(String[] sourceTexts, String sourceLanguage, String targetLanguage) throws URISyntaxException, IOException, TranslatorException {
-        LOGGER.trace("sourceTexts = " + Arrays.toString(sourceTexts) + ", sourceLanguage = " + sourceLanguage + ", targetLanguage = " + targetLanguage);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("sourceTexts = " + Arrays.toString(sourceTexts) + ", sourceLanguage = " + sourceLanguage + ", targetLanguage = " + targetLanguage);
+        }
         List<BasicNameValuePair> getParams = new ArrayList<BasicNameValuePair>(3);
         getParams.add(new BasicNameValuePair("key", apiKey));
         if (sourceLanguage != null) {
@@ -104,14 +111,33 @@ public class Translator implements Closeable {
         getParams.add(new BasicNameValuePair("target", targetLanguage));
 
         URI uri = createURI("/language/translate/v2", getParams);
-        HttpPost httpPost = createHttpPost(uri, sourceTexts);
 
-        TranslateResponse translateResponse = readResponse(httpPost, TranslateResponse.class);
-        Translation[] translations = translateResponse.getData().getTranslations();
-        for (Translation translation : translations) {
+        int fromIndex = 0;
+        int toIndex = sourceTexts.length;
+        Translation[] allTranslations = null;
+        if (toIndex > MAX_SOURCE_TEXTS) {
+            allTranslations = new Translation[sourceTexts.length];
+            toIndex = MAX_SOURCE_TEXTS;
+        }
+        do {
+            HttpPost httpPost = createHttpPost(uri, sourceTexts, fromIndex, toIndex);
+            TranslateResponse translateResponse = readResponse(httpPost, TranslateResponse.class);
+            Translation[] segmentTranslations = translateResponse.getData().getTranslations();
+            if (allTranslations != null) {
+                System.arraycopy(segmentTranslations, 0, allTranslations, fromIndex, segmentTranslations.length);
+            } else {
+                allTranslations = segmentTranslations;
+            }
+
+            fromIndex = toIndex;
+            toIndex = Math.min(sourceTexts.length, fromIndex + MAX_SOURCE_TEXTS);
+        } while (fromIndex < sourceTexts.length);
+
+        for (Translation translation : allTranslations) {
             translation.setTranslatedText(StringEscapeUtils.unescapeHtml4(translation.getTranslatedText()));
         }
-        return translations;
+
+        return allTranslations;
     }
 
     /**
@@ -125,7 +151,9 @@ public class Translator implements Closeable {
      * @throws TranslatorException In case Google Translate API returned an error.
      */
     public Language[] languages(String targetLanguage) throws URISyntaxException, IOException, TranslatorException {
-        LOGGER.trace("targetLanguage = " + targetLanguage);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("targetLanguage = " + targetLanguage);
+        }
         List<BasicNameValuePair> getParams = new ArrayList<BasicNameValuePair>(2);
         getParams.add(new BasicNameValuePair("key", apiKey));
         if (targetLanguage != null) {
@@ -151,14 +179,35 @@ public class Translator implements Closeable {
      * @throws TranslatorException In case Google Translate API returned an error.
      */
     public Detection[][] detect(String[] sourceTexts) throws URISyntaxException, IOException, TranslatorException {
-        LOGGER.trace("sourceTexts = " + Arrays.toString(sourceTexts));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("sourceTexts = " + Arrays.toString(sourceTexts));
+        }
         List<BasicNameValuePair> getParams = Arrays.asList(new BasicNameValuePair("key", apiKey));
 
         URI uri = createURI("/language/translate/v2/detect", getParams);
-        HttpPost httpPost = createHttpPost(uri, sourceTexts);
 
-        DetectResponse detectResponse = readResponse(httpPost, DetectResponse.class);
-        return detectResponse.getData().getDetections();
+        int fromIndex = 0;
+        int toIndex = sourceTexts.length;
+        Detection[][] allDetections = null;
+        if (toIndex > MAX_SOURCE_TEXTS) {
+            allDetections = new Detection[sourceTexts.length][];
+            toIndex = MAX_SOURCE_TEXTS;
+        }
+        do {
+            HttpPost httpPost = createHttpPost(uri, sourceTexts, fromIndex, toIndex);
+            DetectResponse detectionResponse = readResponse(httpPost, DetectResponse.class);
+            Detection[][] segmentDetections = detectionResponse.getData().getDetections();
+            if (allDetections != null) {
+                System.arraycopy(segmentDetections, 0, allDetections, fromIndex, segmentDetections.length);
+            } else {
+                allDetections = segmentDetections;
+            }
+
+            fromIndex = toIndex;
+            toIndex = Math.min(sourceTexts.length, fromIndex + MAX_SOURCE_TEXTS);
+        } while (fromIndex < sourceTexts.length);
+
+        return allDetections;
     }
 
     /**
@@ -167,16 +216,19 @@ public class Translator implements Closeable {
      * Using POST so the limit of the q parameter will be 5K instead of a 2K limit for the URL when using GET.
      *
      * @param uri         The URI to pass to the {@link HttpPost#HttpPost(java.net.URI)} constructor.
-     * @param sourceTexts The texts to add as multiple q parameters
+     * @param sourceTexts The texts to add as multiple q parameters, only texts from fromIndex to toIndex will be sent
+     * @param fromIndex Starting index for the sourceTexts array (inclusive)
+     * @param toIndex Ending index for the sourceTexts array (exclusive)
      * @return The created HttpPost
      * @throws UnsupportedEncodingException if the {@link #PARAMETERS_ENCODING} isn't supported
      */
-    protected HttpPost createHttpPost(URI uri, String[] sourceTexts) throws UnsupportedEncodingException {
+    protected HttpPost createHttpPost(URI uri, String[] sourceTexts, int fromIndex, int toIndex) throws UnsupportedEncodingException {
         HttpPost httpPost = new HttpPost(uri);
         httpPost.addHeader("X-HTTP-Method-Override", "GET");
 
         List<BasicNameValuePair> postParams = new ArrayList<BasicNameValuePair>(sourceTexts.length);
-        for (String sourceText : sourceTexts) {
+        for (int index = fromIndex; index < toIndex; index++) {
+            String sourceText = sourceTexts[index];
             postParams.add(new BasicNameValuePair("q", sourceText));
         }
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, PARAMETERS_ENCODING);
