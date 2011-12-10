@@ -16,6 +16,12 @@ Files
 
 What's new?
 
+Version 0.52
+------------
+* Internally splitting sourceTexts to avoid "Too many text segments" Google Translate API error.
+  The splitting and sending is done internally in the translate and detect methods so there is no limitation of the length of sourceTexts as far as the user is concerned.
+* Adding "location" and "locationType" to ApiError.ErrorEntry
+
 Version 0.51
 ------------
 * Changing default toString behaviour in the core module to allow easier usage in applications.
