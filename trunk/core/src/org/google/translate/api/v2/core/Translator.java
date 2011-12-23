@@ -36,10 +36,10 @@ import java.util.List;
 public class Translator implements Closeable {
 
     /**
-     * Used to avoid the Google API "Too many text segments" error
+     * Used to automatically avoid the Google API "Too many text segments" error - the {@link #detect(String[])} and
+     * {@link #translate(String[], String, String)} methods, internally split the sourceTexts array if needed.
      */
     public static final int MAX_SOURCE_TEXTS = 128;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(Translator.class);
     private static final String SCHEMA = "https";
     private static final String HOST = "www.googleapis.com";
@@ -91,7 +91,7 @@ public class Translator implements Closeable {
      * Translating sourceText from sourceLanguage to targetLanguage.
      *
      * @param sourceTexts    Texts to translate - each text can be in a different language (The total size of the texts
-     *                       must be 5K or less due to Google Translate API limitations)
+     *                       must be 5K or less due to Google Translate API limitations). Not limited by number of texts.
      * @param sourceLanguage The language code of the source text or null for auto detection.
      * @param targetLanguage The language code to translate to.
      * @return The translation results.
@@ -171,7 +171,7 @@ public class Translator implements Closeable {
      * Detects the language of a text.
      *
      * @param sourceTexts Texts to detect - each text can be in a different language (The total size of the texts
-     *                    must be 5K or less due to Google Translate API limitations)
+     *                    must be 5K or less due to Google Translate API limitations). Not limited by number of texts.
      * @return Matrix of detections - each detections[i] corresponds to sourceTexts[i] - if sourceTexts[i] can be
      *         associated with more than one language, detections[i] can contain multiple Detection objects.
      * @throws URISyntaxException  In case of a malformed URI

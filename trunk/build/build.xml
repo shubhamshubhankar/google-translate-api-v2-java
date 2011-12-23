@@ -16,6 +16,9 @@
     <property name="core.jar.full.path" value="${artifacts.dir}/${core.jar.name}"/>
     <property name="cli.jar.full.path" value="${artifacts.dir}/${cli.jar.name}"/>
     <property name="zip.name" value="${name.prefix}${name.suffix}.zip"/>
+    <property name="resources.dir" value="resources"/>
+    <property name="javadoc.dir" value="${resources.dir}/latest-javadoc"/>
+    <property name="javadoc.jar.name" value="${name.prefix}${name.suffix}-javadoc.jar"/>
 
     <path id="core.classpath">
         <fileset id="core.classpath.fileset" dir="${artifacts.dir}/lib-core">
@@ -24,11 +27,11 @@
     </path>
 
     <path id="cli.classpath">
-        <fileset refid="core.classpath.fileset" />
+        <fileset refid="core.classpath.fileset"/>
         <fileset dir="${artifacts.dir}/lib-cli">
             <include name="**/*.jar"/>
         </fileset>
-        <fileset dir="${artifacts.dir}" >
+        <fileset dir="${artifacts.dir}">
             <include name="${core.jar.name}"/>
         </fileset>
     </path>
@@ -45,7 +48,7 @@
             <fileset dir="${classes.dir}" includes="**/*"/>
         </delete>
 
-        <mkdir dir="${classes.dir}" />
+        <mkdir dir="${classes.dir}"/>
         <mkdir dir="${artifacts.dir}"/>
     </target>
 
@@ -143,17 +146,45 @@
         </jar>
     </target>
 
+    <target name="generate-javadoc">
+
+        <delete dir="${javadoc.dir}" />
+
+        <javadoc
+                defaultexcludes="yes"
+                destdir="${javadoc.dir}"
+                windowtitle="Google Translate API v2 Java">
+
+            <packageset dir="${core.src}" defaultexcludes="yes">
+                <include name="org/google/translate/api/v2/**"/>
+            </packageset>
+
+            <packageset dir="${cli.src}" defaultexcludes="yes">
+                <include name="org/google/translate/api/v2/**"/>
+            </packageset>
+        </javadoc>
+
+        <jar destfile="${artifacts.dir}/${javadoc.jar.name}" basedir="${javadoc.dir}">
+            <manifest>
+                <section name="common">
+                    <attribute name="Implementation-Title" value="Google Translate API v2 Core + CLI"/>
+                    <attribute name="Implementation-Version" value="${version}"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
     <!--
         Copy and adjust execution files
         Create a zip that contains it all
     -->
-    <target name="build" depends="cleanup,create-core-jar,create-cli-jar">
+    <target name="build" depends="cleanup,create-core-jar,create-cli-jar,generate-javadoc">
         <copy todir="${artifacts.dir}">
             <fileset dir="${build.dir}">
                 <include name="readme.txt"/>
             </fileset>
         </copy>
 
-        <zip destfile="${artifacts.dir}/${zip.name}" basedir="${artifacts.dir}" />
+        <zip destfile="${artifacts.dir}/${zip.name}" basedir="${artifacts.dir}"/>
     </target>
 </project>
